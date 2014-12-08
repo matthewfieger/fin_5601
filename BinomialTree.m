@@ -1,8 +1,5 @@
-function [price, lattice] = CRR(S,K,r,T,sigma,q,N,IsCall,IsAmer)	
+function [price, lattice] = BinomialTree(S,K,r,T,u,d,p,N,IsCall,IsAmer)	
 	deltaT = T/N; % Discrete time step.
-	u = exp(sigma * sqrt(deltaT)); % Up movement factor.
-	d = 1/u; % Down movement factor.
-	p = (exp((r-q)*deltaT) - d)/(u-d); % Probability of up movement.
 	lattice = zeros(N+1, N+1); % Empty lattice for our values. Must add 1 for one-based indexing.
 
 	if IsCall

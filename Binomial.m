@@ -1,10 +1,28 @@
-function [price, lattice] = CRR(S,K,r,T,sigma,q,N,IsCall,IsAmer)	
+function [price, lattice] = Binomial(S,K,r,T,sigma,q,N,IsCall,IsAmer,Method)	
 	deltaT = T/N; % Discrete time step.
-	u = exp(sigma * sqrt(deltaT)); % Up movement factor.
-	d = 1/u; % Down movement factor.
-	p = (exp((r-q)*deltaT) - d)/(u-d); % Probability of up movement.
-	lattice = zeros(N+1, N+1); % Empty lattice for our values. Must add 1 for one-based indexing.
+	if strcmp(Method,'EQP') % compare two strings
+		% EQP Specification
+		u=exp((r-q-(sigma^2)/2)*deltaT + sigma*sqrt(deltaT));
+		d=exp((r-q-(sigma^2)/2)*deltaT - sigma*sqrt(deltaT));
+		p=0.5;
+	elseif strcmp(Method,'TIAN') % compare two strings
+		% Strike exactly on node - TIAN
+		u = exp(sigma * sqrt(deltaT)); % Up movement factor.
+		d = 1/u; % Down movement factor.
+		j=ceil((log(K/S)- N*log(d))/(log(u/d)));
+		tilt = (K/(S*(u^j)*(d^(N-j))))^(1/N);
+		u=u*tilt; % tilt the tree
+		d=d*tilt;
+		p=(exp((r-q)*deltaT) - d)/(u-d);
+	else
+		% CRR Specification
+		u = exp(sigma * sqrt(deltaT)); % Up movement factor.
+		d = 1/u; % Down movement factor.
+		p = (exp((r-q)*deltaT) - d)/(u-d); % Probability of up movement.
+	end
 
+	lattice = zeros(N+1, N+1); % Empty lattice for our values. Must add 1 for one-based indexing.
+	
 	if IsCall
 		Intrinsic = @(S) max(0,S-K);
 	else
