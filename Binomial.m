@@ -14,6 +14,20 @@ function [price, lattice] = Binomial(S,K,r,T,sigma,q,N,IsCall,IsAmer,Method)
 		u=u*tilt; % tilt the tree
 		d=d*tilt;
 		p=(exp((r-q)*deltaT) - d)/(u-d);
+	elseif strcmp(Method,'LR')
+		% Leisen-Reimer Specification
+		d1 = (log(S/K) + (r-q+(sigma^2)/2)*T) / (sigma*sqrt(T));
+		d2 = (log(S/K) + (r-q-(sigma^2)/2)*T) / (sigma*sqrt(T));
+
+		% Preizer-Pratt inversion method 1
+		h = @(x) 0.5+sign(x)*(0.25-0.25*(exp( -1*((x/(N+1/3))^2)*(N+1/6) ) ) )^0.5;
+
+		% Preizer-Pratt inversion method 2
+		% h = @(x) 0.5+sign(x)*(0.25-0.25*(exp( -1*((x/(N+1/3+0.1/(N+1)))^2)*(N+1/6) ) ) )^0.5;
+
+		p = h(d2);
+		u = exp((r-q)*deltaT)*(h(d1)/h(d2));
+		d = (exp((r-q)*deltaT) - p*u) / (1-p);
 	else
 		% CRR Specification
 		u = exp(sigma * sqrt(deltaT)); % Up movement factor.

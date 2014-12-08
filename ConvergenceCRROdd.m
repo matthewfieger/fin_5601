@@ -6,7 +6,7 @@ function ConvergenceCRREven(S,K,r,T,sigma,q,N,IsCall)
 	for i = (1:N/2)
 		LatticeC(i) = EuroCRR(S,K,r,T,sigma,q,i*2-1,IsCall);
 	end
-	vector = (1:N/2)*2
-	plot(1:N/2, ones(1,N/2)*black_scholes_price);
+	vector = (1:N/2)*2;
+	plot(vector, ones(1,N/2)*black_scholes_price);
 	hold on;
-	plot(1:N/2, LatticeC);
+	plot(vector, LatticeC);
